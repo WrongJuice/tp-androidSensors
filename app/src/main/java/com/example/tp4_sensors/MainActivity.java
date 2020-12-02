@@ -18,7 +18,6 @@ public class MainActivity extends AppCompatActivity {
     private Sensor mAccelerometer = null;
     private Sensor mMagnetometer = null;
     private float[] mAccelerometerValues, mMagnetometerValues;
-    private boolean displayNeeded = false;
 
     final SensorEventListener mAccelerometerEventListener = new SensorEventListener() {
         public void onAccuracyChanged(Sensor sensor, int accuracy) {
@@ -28,7 +27,7 @@ public class MainActivity extends AppCompatActivity {
         public void onSensorChanged(SensorEvent sensorEvent) {
             // Que faire en cas d'évènements sur le capteur ?
             mAccelerometerValues = sensorEvent.values;
-            displayNeeded = true;
+            valuesChanged();
         }
     };
 
@@ -71,6 +70,8 @@ public class MainActivity extends AppCompatActivity {
 
         mSensorManager.registerListener(mAccelerometerEventListener, mAccelerometer, SensorManager.SENSOR_DELAY_UI);
         mSensorManager.registerListener(mMagnetometerEventListener, mMagnetometer, SensorManager.SENSOR_DELAY_UI);
+
+
     }
 
     @Override
@@ -92,15 +93,14 @@ public class MainActivity extends AppCompatActivity {
         float[] values = new float[3];
         float[] R = new float[9];
 
-        if(mAccelerometerValues != null && mMagnetometerValues != null && displayNeeded){
-            SensorManager.getRotationMatrix(R, null, values, R);
+        if(mAccelerometerValues != null && mMagnetometerValues != null){
+            SensorManager.getRotationMatrix(R, null, mAccelerometerValues, mMagnetometerValues);
             SensorManager.getOrientation(R, values);
 
             Log.d("Sensors", "Rotation sur l'axe z : " + values[0]);
             Log.d("Sensors", "Rotation sur l'axe x : " + values[1]);
             Log.d("Sensors", "Rotation sur l'axe y : " + values[2]);
 
-            displayNeeded = false;
         }
 
     }
